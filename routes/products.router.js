@@ -1,22 +1,11 @@
 const express = require('express');
-const { faker } = require('@faker-js/faker')
+const ProductService = require('./../services/product.service')
 
 const router = express.Router();
-
+const service = new ProductService();
 
 router.get('/', (req, res)=>{
-  const products = [];
-  const { size } = req.query;
-  const limit = size || 10;
-  for(let i = 0; i < limit; i++){
-    products.push(
-      {
-        name: faker.commerce.productName(),
-        price: parseInt(faker.commerce.price(), 10),
-        image: faker.image.imageUrl(),
-      }
-    )
-  }
+  const products = service.find()
   res.json(products);
 });
 //Todo lo que sea especifico (rutas) debe ir antes de lo que es dinamico
@@ -29,16 +18,13 @@ router.get('/filter', (req,res)=>{
 router.get('/:id',(req, res)=>{
   //se coloca es el nombre que coloque en el identificador. como esta vez colocamos el 'id' se desestructura { id }
   const { id } = req.params;
-  res.json({
-    id,
-    name: 'Producto 1',
-    price: 1000,
-  })
+  const product = service.findOne(id);
+  res.json(product);
 });
 
 router.post('/', (req,res)=>{
   const body = req.body;
-  res.json({
+  res.status(201).json({
     message: 'created',
     data: body
   });
