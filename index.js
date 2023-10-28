@@ -1,13 +1,15 @@
 const express = require('express');
 const routerApi = require('./routes');
-const app = express();
 
+const app = express();
 const port = 3000;
 
 app.use(express.json());
 
+
+
 app.get('/', (req, res)=>{
-  res.send('Hola servidor creado en express');
+  res.send('Hola servidor creado en express que tal');
 });
 
 
@@ -16,6 +18,7 @@ app.get('/nueva-ruta', (req, res)=>{
 });
 
 routerApi(app);
+
 
 app.listen(port, ()=>{
   console.log('si esta corriendo en el puerto '+ port);
