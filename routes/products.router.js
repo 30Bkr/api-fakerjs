@@ -4,8 +4,8 @@ const ProductService = require('./../services/product.service')
 const router = express.Router();
 const service = new ProductService();
 
-router.get('/', (req, res)=>{
-  const products = service.find()
+router.get('/', async (req, res)=>{
+  const products = await service.find()
   res.json(products);
 });
 //Todo lo que sea especifico (rutas) debe ir antes de lo que es dinamico
@@ -15,37 +15,41 @@ router.get('/filter', (req,res)=>{
   res.send('Yo soy un filter');
 });
 
-router.get('/:id',(req, res)=>{
+router.get('/:id', async (req, res)=>{
   //se coloca es el nombre que coloque en el identificador. como esta vez colocamos el 'id' se desestructura { id }
+  try{
+    const { id } = req.params;
+    const product = await service.findOne(id);
+    res.json(product);
+  }catch(error){
+    next(error)
+  }
+
+});
+
+router.post('/', async (req,res)=>{
+  const body = req.body;
+  const newProduct = await service.create(body);
+  res.status(201).json(newProduct)
+});
+
+router.patch('/:id', async(req,res)=>{
+  try{
   const { id } = req.params;
-  const product = service.findOne(id);
+  const body = req.body;
+  const product = await service.update(id, body);
   res.json(product);
+  } catch(error){
+    res.status(404).json({
+      message: error.message
+    });
+  }
 });
 
-router.post('/', (req,res)=>{
-  const body = req.body;
-  res.status(201).json({
-    message: 'created',
-    data: body
-  });
-});
-
-router.patch('/:id', (req,res)=>{
+router.delete('/:id', async (req,res)=>{
   const { id } = req.params;
-  const body = req.body;
-  res.json({
-    message: 'update',
-    data: body,
-    id,
-  });
-});
-
-router.delete('/:id', (req,res)=>{
-  const { id } = req.params;
-  res.json({
-    message: 'deleted',
-    id,
-  });
+  const rta = await service.delete(id);
+  res.json(rta);
 });
 
 module.exports = router;
